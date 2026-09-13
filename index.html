@@ -182,7 +182,7 @@ body{font-family:'Noto Sans KR','Segoe UI',sans-serif;background:#0f0f1a;min-hei
       <label>후원 금액 (선택)</label>
       <div class="amount-chips" id="amount-chips"></div>
       <div class="amount-row">
-        <input id="post-amount" type="number" min="0" step="1000" placeholder="직접 입력 또는 금액 선택" autocomplete="off">
+        <input id="post-amount" type="number" min="0" max="50000" step="1000" placeholder="직접 입력 또는 금액 선택" autocomplete="off" oninput="capAmount(this)">
         <span class="won">원</span>
       </div>
       <div class="amount-limit" id="amount-limit" style="display:none;margin-top:8px;font-size:.78em;color:#888"></div>
@@ -444,7 +444,8 @@ function renderAmountChips(){
     b.textContent=fmt(v)+'원';
     b.onclick=()=>{
       const inp=document.getElementById('post-amount');
-      inp.value=(Number(inp.value)||0)+v;
+      const cap=Number(settings.maxPerPerson)||50000;
+      inp.value=Math.min(cap,(Number(inp.value)||0)+v);
       b.classList.add('on');
       b.style.transform='scale(.95)';
       setTimeout(()=>{
@@ -541,6 +542,13 @@ async function sendPost(){
     console.warn(e);
   }
   btn.disabled=false;
+}
+
+function capAmount(el){
+  const cap=Number(settings.maxPerPerson)||50000;
+  let v=Number(el.value)||0;
+  if(v>cap)v=cap;
+  el.value=v;
 }
 
 function copyAccount(){
