@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a1a2e">
+<title>동우야, 생일 축하해</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Noto Sans KR','Segoe UI',sans-serif;background:#0f0f1a;min-height:100vh;color:#e0e0e0;overflow-x:hidden}
+
+.bg-glow{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bg-glow .orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.2;animation:drift 20s ease-in-out infinite alternate}
+.bg-glow .orb:nth-child(1){width:600px;height:600px;background:#6c5ce7;top:-15%;left:-10%;animation-duration:18s}
+.bg-glow .orb:nth-child(2){width:500px;height:500px;background:#fd79a8;bottom:-20%;right:-10%;animation-duration:22s}
+.bg-glow .orb:nth-child(3){width:350px;height:350px;background:#00cec9;top:40%;left:50%;animation-duration:25s}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.1)}100%{transform:translate(-20px,40px) scale(.95)}}
+
+.container{position:relative;z-index:5;max-width:640px;margin:0 auto;padding:40px 20px 80px}
+
+.hero{text-align:center;padding:20px 0 28px}
+.hero-icon{width:90px;height:90px;margin:0 auto 20px;background:linear-gradient(135deg,#6c5ce7,#a29bfe);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:42px;box-shadow:0 0 50px rgba(108,92,231,.4);animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+#hero-title{font-size:2em;font-weight:900;background:linear-gradient(135deg,#a29bfe,#fd79a8,#fdcb6e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.35}
+#hero-name{font-size:1.3em;font-weight:700;color:#fd79a8;margin-top:10px}
+.hero .date-badge{display:inline-block;margin-top:16px;padding:6px 20px;border-radius:30px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);font-size:.85em;color:#aaa;font-weight:500}
+#hero-sub{margin-top:16px;color:#888;font-size:.92em;line-height:1.7}
+
+.bank-banner{background:linear-gradient(135deg,rgba(0,206,201,.12),rgba(108,92,231,.15));border:1px solid rgba(0,206,201,.3);border-radius:22px;padding:22px;margin-bottom:24px;text-align:center}
+.bank-banner .bb-label{font-size:.78em;color:#aaa;font-weight:700;letter-spacing:1.5px;margin-bottom:13px}
+.bank-banner .bb-account{font-size:1.45em;font-weight:900;color:#eee;letter-spacing:1px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.bank-banner .bb-account .chip{font-size:.55em;background:rgba(0,206,201,.18);border:1px solid rgba(0,206,201,.4);color:#00cec9;padding:7px 12px;border-radius:10px;cursor:pointer;transition:all .2s;font-weight:700}
+.bank-banner .bb-account .chip:hover{background:rgba(0,206,201,.3)}
+.bank-banner .bb-holder{font-size:.9em;color:#00cec9;margin-top:9px;font-weight:600}
+
+.fund-banner{background:linear-gradient(135deg,rgba(108,92,231,.15),rgba(253,121,168,.15));border:1px solid rgba(108,92,231,.3);border-radius:20px;padding:22px;text-align:center;margin-bottom:24px}
+.fund-banner .lb{font-size:.8em;color:#aaa;font-weight:600;letter-spacing:1px}
+.fund-banner .total{font-size:2.2em;font-weight:900;background:linear-gradient(135deg,#a29bfe,#fd79a8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:4px 0;font-variant-numeric:tabular-nums}
+.fund-banner .note{font-size:.82em;color:#777}
+
+.form-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:28px 24px;margin-bottom:24px;backdrop-filter:blur(20px);transition:border-color .3s}
+.form-card:focus-within{border-color:rgba(108,92,231,.4)}
+.form-header{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.form-header-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.form-header h2{font-size:1.05em;font-weight:700;color:#ddd}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:.8em;font-weight:600;color:#888;margin-bottom:7px;letter-spacing:.5px;text-transform:uppercase}
+.field input,.field textarea{width:100%;padding:14px 18px;border:1.5px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.04);color:#eee;font-size:.95em;font-family:inherit;outline:none;transition:border-color .25s,box-shadow .25s}
+.field input:focus,.field textarea:focus{border-color:#6c5ce7;box-shadow:0 0 0 3px rgba(108,92,231,.15)}
+.field input::placeholder,.field textarea::placeholder{color:#555}
+.field textarea{resize:vertical;min-height:100px;line-height:1.7}
+.char-count{display:block;text-align:right;font-size:.75em;color:#555;margin-top:5px}
+.amount-row{display:flex;align-items:center;gap:10px}
+.amount-row input{flex:1}
+.amount-row .won{color:#888;font-weight:700;flex-shrink:0}
+.amount-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.amount-chip{padding:10px 18px;border:1.5px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.03);color:#fdcb6e;font-size:.9em;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+.amount-chip:hover{border-color:rgba(253,203,110,.5);background:rgba(253,203,110,.08)}
+.amount-chip.on{border-color:#fdcb6e;background:rgba(253,203,110,.15);box-shadow:0 0 0 3px rgba(253,203,110,.12)}
+.btn-submit{width:100%;padding:16px;border:none;border-radius:14px;font-size:1em;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#fdcb6e,#e17055);color:#1a1a2e;font-family:inherit;transition:transform .15s,box-shadow .25s,opacity .2s;margin-top:4px}
+.btn-submit:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(253,203,110,.35)}
+.btn-submit:active{transform:translateY(0)}
+.btn-submit:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-submit.submit-purple{background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff}
+.btn-submit.submit-purple:hover{box-shadow:0 8px 30px rgba(108,92,231,.4)}
+.howto{margin-top:12px;padding:14px 16px;border-radius:12px;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.12);font-size:.84em;color:#888;line-height:1.7}
+
+.list-title{font-size:1.05em;font-weight:800;color:#e0e0e0;margin:32px 0 6px}
+.list-sub{font-size:.82em;color:#666;margin-bottom:18px}
+.msg-list{display:flex;flex-direction:column;gap:10px}
+.msg-card{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:18px 20px;display:flex;gap:14px;transition:border-color .3s,background .3s;animation:fadeUp .4s ease-out;position:relative}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.msg-card:hover{border-color:rgba(108,92,231,.25);background:rgba(255,255,255,.055)}
+.msg-avatar{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:.9em;font-weight:800;color:#fff;flex-shrink:0}
+.msg-main{flex:1;min-width:0}
+.msg-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.msg-name{font-weight:700;font-size:.92em;color:#ddd}
+.msg-time{font-size:.75em;color:#555;margin-left:auto;flex-shrink:0}
+.msg-donation{display:inline-flex;align-items:center;gap:5px;margin-bottom:8px;padding:5px 13px;border-radius:20px;font-size:.8em;font-weight:800;background:linear-gradient(135deg,rgba(253,203,110,.15),rgba(225,112,85,.15));border:1px solid rgba(253,203,110,.3);color:#fdcb6e;font-variant-numeric:tabular-nums}
+.msg-body{color:#bbb;font-size:.92em;line-height:1.7;word-break:break-word;white-space:pre-wrap}
+.del-btn{position:absolute;top:12px;right:12px;display:none;width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#e74c3c;cursor:pointer;font-size:13px;line-height:1;align-items:center;justify-content:center;z-index:2}
+.admin-on .msg-card .del-btn{display:flex}
+.del-btn:hover{background:rgba(231,76,60,.2);border-color:#e74c3c}
+.toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);background:#1e1e3a;border:1px solid rgba(108,92,231,.3);color:#ddd;padding:14px 24px;border-radius:14px;font-size:.9em;font-weight:500;opacity:0;transition:all .3s;z-index:50;max-width:90%;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.loading{display:flex;justify-content:center;padding:40px}
+.spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,.1);border-top-color:#6c5ce7;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-text{text-align:center;color:#555;font-size:.88em;padding:28px 10px;line-height:1.8}
+.footer{text-align:center;margin-top:50px;padding-top:20px;border-top:1px solid rgba(255,255,255,.06);font-size:.8em;color:#444;line-height:1.8}
+.admin-link{background:none;border:none;cursor:pointer;color:#2a2a3e;font-size:.8em;text-decoration:underline;text-underline-offset:3px}
+.admin-link:hover{color:#666}
+.admin-bar{position:fixed;top:14px;right:14px;z-index:40;display:flex;gap:8px}
+.admin-bar button{display:none;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#e74c3c;border-radius:12px;padding:8px 14px;font-size:.8em;cursor:pointer;font-family:inherit}
+.admin-on .admin-bar button{display:block}
+.popover{position:fixed;top:0;left:0;right:0;bottom:0;z-index:60;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;animation:fadeIn .2s;padding:16px}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.popover.hidden{display:none}
+.pop-card{background:linear-gradient(180deg,#1c1c38,#14142a);border:1px solid rgba(108,92,231,.35);border-radius:20px;padding:26px;width:min(92%,430px);max-height:86vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.pop-card h3{font-size:1.05em;font-weight:700;color:#a29bfe;margin-bottom:14px}
+.pop-msg{font-size:.85em;color:#888;margin-bottom:12px;line-height:1.6}
+.pop-card input,.pop-card textarea{width:100%;padding:12px 14px;border:1.5px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.04);color:#eee;font-size:.92em;font-family:inherit;outline:none;margin-bottom:12px;transition:border-color .2s}
+.pop-card input:focus,.pop-card textarea:focus{border-color:#6c5ce7}
+.pop-card label{display:block;font-size:.78em;font-weight:600;color:#888;margin-bottom:6px}
+.pop-btns{display:flex;gap:10px;justify-content:center;margin-top:8px}
+.pop-btns button{flex:1;padding:12px;border:none;border-radius:12px;font-size:.9em;font-weight:700;cursor:pointer;font-family:inherit}
+.pop-ok{background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff}
+.pop-no{background:rgba(255,255,255,.06);color:#888}
+
+@media(max-width:500px){
+  #hero-title{font-size:1.6em}
+  .container{padding:28px 16px 60px}
+  .bank-banner .bb-account{font-size:1.2em}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow">
+  <div class="orb"></div>
+  <div class="orb"></div>
+  <div class="orb"></div>
+</div>
+
+<div class="admin-bar">
+  <button id="btn-settings" onclick="openSettings()">설정</button>
+  <button id="btn-exit" onclick="exitAdmin()">관리자 종료</button>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">🎂</div>
+    <h1 id="hero-title">동우야,<br>생일 축하해!</h1>
+    <div id="hero-name" class="name">강동우</div>
+    <div class="date-badge">2026.09.14</div>
+    <p id="hero-sub" class="sub">휴대폰은 못 쓰지만 우리 모두의 마음은 여기 있어요<br>메시지와 후원으로 축하해주세요</p>
+  </div>
+
+  <div class="bank-banner">
+    <div class="bb-label">생일 모금 계좌</div>
+    <div class="bb-account">
+      <span id="bank-name">카카오뱅크</span>
+      <span id="bank-account">3333-01-0000000</span>
+      <button class="chip" onclick="copyAccount()">복사</button>
+    </div>
+    <div class="bb-holder" id="bank-holder">예금주 · 강동우</div>
+  </div>
+
+  <div class="fund-banner">
+    <div class="lb">모금 현황</div>
+    <div class="total" id="fund-total">0원</div>
+    <div class="note" id="fund-note">후원해주면 동우가 세배로 기뻐해요</div>
+  </div>
+
+  <div class="form-card">
+    <div class="form-header">
+      <div class="form-header-icon">🎁</div>
+      <h2>후원 &amp; 축하 메시지</h2>
+    </div>
+    <div class="field">
+      <label>이름</label>
+      <input id="post-name" placeholder="이름을 입력해주세요" maxlength="10" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>후원 금액 (선택)</label>
+      <div class="amount-chips" id="amount-chips"></div>
+      <div class="amount-row">
+        <input id="post-amount" type="number" min="0" step="1000" placeholder="직접 입력 또는 금액 선택" autocomplete="off">
+        <span class="won">원</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>메시지</label>
+      <textarea id="post-text" placeholder="동우에게 하고 싶은 말을 적어보세요" maxlength="300" oninput="updateCount()"></textarea>
+      <span class="char-count" id="char-count">0 / 300</span>
+    </div>
+    <button class="btn-submit" id="btn-post" onclick="sendPost()">보내기</button>
+    <div class="howto">계좌로 이체한 뒤 위 금액을 입력해 기록을 남겨주세요!<br>돈이 없어도 메시지만 남길 수 있어요.</div>
+  </div>
+
+  <div class="list-title">🕯 후원 &amp; 축하 기록</div>
+  <div class="list-sub" id="post-sub">불러오는 중...</div>
+  <div id="post-list" class="msg-list">
+    <div class="loading"><div class="spinner"></div></div>
+  </div>
+
+  <div class="footer">
+    모든 친구들이 함께 쓴 생일 카드<br>
+    <button class="admin-link" onclick="openAdmin()">관리자</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<div id="admin-pop" class="popover hidden">
+  <div class="pop-card" id="admin-pop-card"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyBr0KEp0He77u9pnXb8_ywAGskPuZ60r7k",authDomain:"quiz-ranking-6cb9f.firebaseapp.com",projectId:"quiz-ranking-6cb9f",storageBucket:"quiz-ranking-6cb9f.firebasestorage.app",messagingSenderId:"488270918333",appId:"1:488270918333:web:93f4612335b58780b43dd4"};
+const ADMIN_PASS='dongwoo0921';
+let fs;
+try{firebase.initializeApp(firebaseConfig);fs=firebase.firestore()}catch(e){console.warn('firebase init failed',e)}
+
+const DEFAULT_SETTINGS={
+  title:'동우야,\n생일 축하해!',
+  name:'강동우',
+  subtitle:'휴대폰은 못 쓰지만 우리 모두의 마음은 여기 있어요\n메시지와 후원으로 축하해주세요',
+  bankLabel:'생일 모금 계좌',
+  bankName:'카카오뱅크',
+  bankAccount:'3333-01-0000000',
+  bankHolder:'강동우',
+  amounts:[5000,10000,30000,50000],
+};
+
+const AVATAR_GRADIENTS=[
+  'linear-gradient(135deg,#6c5ce7,#a29bfe)',
+  'linear-gradient(135deg,#fd79a8,#e84393)',
+  'linear-gradient(135deg,#00cec9,#0984e3)',
+  'linear-gradient(135deg,#fdcb6e,#e17055)',
+  'linear-gradient(135deg,#00b894,#00cec9)',
+  'linear-gradient(135deg,#e84393,#d63031)',
+  'linear-gradient(135deg,#74b9ff,#a29bfe)',
+  'linear-gradient(135deg,#fab1a0,#e17055)',
+];
+
+let settings=Object.assign({},DEFAULT_SETTINGS);
+let postsCache=[];
+let isAdmin=false;
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(showToast._tm);
+  showToast._tm=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function fmt(n){return String(Number(n)||0).toLocaleString()}
+
+function nl2br(s){return esc(s).replace(/\n/g,'<br>')}
+
+function applySettings(){
+  document.getElementById('hero-title').innerHTML=nl2br(settings.title);
+  document.getElementById('hero-name').textContent=settings.name;
+  document.getElementById('hero-sub').innerHTML=nl2br(settings.subtitle);
+  document.getElementById('bank-name').textContent=settings.bankName;
+  document.getElementById('bank-account').textContent=settings.bankAccount;
+  document.getElementById('bank-holder').textContent='예금주 · '+settings.bankHolder;
+  document.title=(settings.name||'동우')+'야, 생일 축하해';
+  renderAmountChips();
+  renderTotal();
+}
+
+function renderAmountChips(){
+  const wrap=document.getElementById('amount-chips');
+  wrap.innerHTML='';
+  (settings.amounts||[]).forEach(v=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='amount-chip';
+    b.textContent=fmt(v)+'원';
+    b.onclick=()=>{
+      document.querySelectorAll('.amount-chip').forEach(c=>c.classList.remove('on'));
+      b.classList.add('on');
+      document.getElementById('post-amount').value=v;
+    };
+    wrap.appendChild(b);
+  });
+}
+
+function renderTotal(){
+  const total=(postsCache||[]).reduce((a,p)=>a+(Number(p.amount)||0),0);
+  document.getElementById('fund-total').textContent=fmt(total)+'원';
+  const note=document.getElementById('fund-note');
+  if(total>=100000)note.textContent='와, 천재 폭발 반응! 동우가 울지도 몰라요';
+  else if(total>=50000)note.textContent='핵심 투자자들 덕분에 펀딩 대박이에요';
+  else if(total>=20000)note.textContent='훈훈한 정이 느껴져요. 고마워요!';
+  else if(total>=10000)note.textContent='동우의 미소를 위한 투자, 시작됐어요';
+  else if(total>=5000)note.textContent='조금씩 모이면 큰 선물이 될 거예요';
+  else note.textContent='후원해주면 동우가 세배로 기뻐해요';
+}
+
+function renderPosts(list){
+  const wrap=document.getElementById('post-list');
+  const sub=document.getElementById('post-sub');
+  if(!list.length){
+    wrap.innerHTML='<div class="empty-text">아직 기록이 없어요.<br>첫 번째 후원 &amp; 축하 메시지를 남겨보세요!</div>';
+    sub.textContent='아직 기록이 없습니다';
+    return;
+  }
+  sub.textContent='총 '+list.length+'개의 후원 &amp; 축하 메시지';
+  wrap.innerHTML='';
+  list.forEach((p,i)=>{
+    const el=document.createElement('div');
+    el.className='msg-card';
+    const g=AVATAR_GRADIENTS[i%AVATAR_GRADIENTS.length];
+    const amt=Number(p.amount)||0;
+    const donBadge=amt>0?'<div class="msg-donation">💰 '+fmt(amt)+'원 후원</div>':'';
+    el.innerHTML='<div class="msg-avatar" style="background:'+g+'">'+esc((p.name||'?')[0])+'</div><div class="msg-main"><div class="msg-top"><div class="msg-name">'+esc(p.name)+'</div><div class="msg-time">'+formatTime(p.time)+'</div></div>'+donBadge+'<div class="msg-body">'+esc(p.text)+'</div></div><button class="del-btn" title="삭제" onclick="delPost(\''+p.id+'\')">✕</button>';
+    wrap.appendChild(el);
+  });
+  renderTotal();
+}
+
+function formatTime(t){
+  if(!t)return'';
+  try{
+    const d=t.toDate?t.toDate():new Date(t);
+    const now=new Date();
+    const diff=now-d;
+    if(diff<0)return '';
+    if(diff<60000)return '방금';
+    if(diff<3600000)return Math.floor(diff/60000)+'분 전';
+    if(diff<86400000)return Math.floor(diff/3600000)+'시간 전';
+    const m=d.getMonth()+1, day=d.getDate();
+    return m+'/'+day;
+  }catch(e){return ''}
+}
+
+function updateCount(){
+  document.getElementById('char-count').textContent=document.getElementById('post-text').value.length+' / 300';
+}
+
+async function sendPost(){
+  const btn=document.getElementById('btn-post');
+  const name=document.getElementById('post-name').value.trim();
+  const amount=Math.max(0,Number(document.getElementById('post-amount').value)||0);
+  const text=document.getElementById('post-text').value.trim();
+  if(!name){showToast('이름을 입력해주세요');return}
+  if(!text){showToast('메시지를 입력해주세요');return}
+  if(!fs){showToast('연결 오류입니다. 잠시 후 다시 시도해주세요');return}
+  btn.disabled=true;
+  try{
+    await fs.collection('birthday_posts').add({name,amount,text,time:new Date()});
+    document.getElementById('post-amount').value='';
+    document.getElementById('post-text').value='';
+    document.querySelectorAll('.amount-chip').forEach(c=>c.classList.remove('on'));
+    updateCount();
+    showToast(amount>0?fmt(amount)+'원 후원 기록이 등록됐어요! 소중한 정성 감사합니다':'메시지가 전달되었습니다');
+  }catch(e){
+    showToast('전송 실패. 다시 시도해주세요');
+    console.warn(e);
+  }
+  btn.disabled=false;
+}
+
+function copyAccount(){
+  const v=settings.bankAccount||'';
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(v).then(()=>showToast('계좌번호가 복사됐어요')).catch(()=>showToast('계좌번호 : '+v));
+  }else{
+    showToast('계좌번호 : '+v);
+  }
+}
+
+function delPost(id){
+  if(!isAdmin)return;
+  if(!confirm('이 기록을 삭제할까요?'))return;
+  fs.collection('birthday_posts').doc(id).delete().then(()=>{
+    showToast('삭제되었습니다');
+  }).catch(e=>{showToast('삭제 실패');console.warn(e)});
+}
+
+function openAdmin(){
+  const card=document.getElementById('admin-pop-card');
+  card.innerHTML='<h3>관리자 인증</h3><div class="pop-msg">타이틀·계좌·설정 관리, 기록 삭제가 가능해요.</div><input type="password" id="admin-pass" placeholder="비밀번호"><div class="pop-btns"><button class="pop-no" onclick="closePop()">취소</button><button class="pop-ok" onclick="tryAdmin()">확인</button></div>';
+  document.getElementById('admin-pop').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('admin-pass').focus(),50);
+}
+
+function openSettings(){
+  const card=document.getElementById('admin-pop-card');
+  card.innerHTML=
+    '<h3>설정</h3>'+
+    '<label>타이틀</label><textarea id="st-title" rows="2" placeholder="동우야, 생일 축하해!"></textarea>'+
+    '<label>이름</label><input id="st-name" placeholder="강동우">'+
+    '<label>소개 문구</label><textarea id="st-subtitle" rows="2"></textarea>'+
+    '<label>은행 이름</label><input id="st-bankname" placeholder="카카오뱅크">'+
+    '<label>계좌번호</label><input id="st-account" placeholder="3333-01-0000000">'+
+    '<label>예금주</label><input id="st-holder" placeholder="강동우">'+
+    '<label>후원 금액 버튼 (쉼표 구분)</label><input id="st-amounts" placeholder="5000,10000,30000,50000">'+
+    '<div class="pop-btns"><button class="pop-no" onclick="closePop()">닫기</button><button class="pop-ok" onclick="saveSettings()">저장</button></div>';
+  document.getElementById('st-title').value=settings.title;
+  document.getElementById('st-name').value=settings.name;
+  document.getElementById('st-subtitle').value=settings.subtitle;
+  document.getElementById('st-bankname').value=settings.bankName;
+  document.getElementById('st-account').value=settings.bankAccount;
+  document.getElementById('st-holder').value=settings.bankHolder;
+  document.getElementById('st-amounts').value=(settings.amounts||[]).join(',');
+  document.getElementById('admin-pop').classList.remove('hidden');
+}
+
+async function saveSettings(){
+  const amounts=(document.getElementById('st-amounts').value||'').split(',').map(s=>parseInt(s,10)).filter(n=>!isNaN(n)&&n>0);
+  const data={
+    title:document.getElementById('st-title').value,
+    name:document.getElementById('st-name').value,
+    subtitle:document.getElementById('st-subtitle').value,
+    bankName:document.getElementById('st-bankname').value,
+    bankAccount:document.getElementById('st-account').value,
+    bankHolder:document.getElementById('st-holder').value,
+    amounts:amounts.length?amounts:DEFAULT_SETTINGS.amounts,
+  };
+  try{
+    await fs.collection('birthday_settings').doc('main').set(data);
+    showToast('설정이 저장되었습니다');
+    closePop();
+  }catch(e){
+    showToast('저장 실패. 다시 시도해주세요');
+    console.warn(e);
+  }
+}
+
+function tryAdmin(){
+  const v=document.getElementById('admin-pass').value;
+  if(v===ADMIN_PASS){
+    isAdmin=true;
+    document.body.classList.add('admin-on');
+    closePop();
+    showToast('관리자 모드 활성화');
+  }else{
+    showToast('비밀번호가 틀렸습니다');
+    document.getElementById('admin-pass').value='';
+  }
+}
+
+function closePop(){
+  document.getElementById('admin-pop').classList.add('hidden');
+}
+
+function exitAdmin(){
+  isAdmin=false;
+  document.body.classList.remove('admin-on');
+  showToast('관리자 모드 종료');
+}
+
+(function init(){
+  if(!fs)return;
+  fs.collection('birthday_settings').doc('main').onSnapshot(doc=>{
+    if(doc.exists){
+      settings=Object.assign({},DEFAULT_SETTINGS,doc.data());
+    }
+    applySettings();
+  },e=>{console.warn(e);applySettings()});
+  fs.collection('birthday_posts').orderBy('time','desc').onSnapshot(snap=>{
+    postsCache=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderPosts(postsCache);
+  },e=>{console.warn(e)});
+})();
+</script>
+</body>
+</html>
