@@ -33,6 +33,11 @@ body{font-family:'Noto Sans KR','Segoe UI',sans-serif;background:#0f0f1a;min-hei
 .bank-banner .bb-account .chip{font-size:.55em;background:rgba(0,206,201,.18);border:1px solid rgba(0,206,201,.4);color:#00cec9;padding:7px 12px;border-radius:10px;cursor:pointer;transition:all .2s;font-weight:700}
 .bank-banner .bb-account .chip:hover{background:rgba(0,206,201,.3)}
 .bank-banner .bb-holder{font-size:.9em;color:#00cec9;margin-top:9px;font-weight:600}
+.bank-banner .bb-btn{font-size:.8em;padding:10px 16px;border-radius:12px;cursor:pointer;font-weight:700;font-family:inherit;transition:all .2s}
+.bank-banner .bb-btn.copy{background:rgba(0,206,201,.15);border:1px solid rgba(0,206,201,.4);color:#00cec9}
+.bank-banner .bb-btn.copy:hover{background:rgba(0,206,201,.25)}
+.bank-banner .bb-btn.toss{background:linear-gradient(135deg,#3182f6,#1c5fd0);border:1px solid rgba(49,130,246,.6);color:#fff}
+.bank-banner .bb-btn.toss:hover{box-shadow:0 6px 20px rgba(49,130,246,.4)}
 
 .fund-banner{background:linear-gradient(135deg,rgba(108,92,231,.15),rgba(253,121,168,.15));border:1px solid rgba(108,92,231,.3);border-radius:20px;padding:22px;text-align:center;margin-bottom:24px}
 .fund-banner .lb{font-size:.8em;color:#aaa;font-weight:600;letter-spacing:1px}
@@ -138,13 +143,16 @@ body{font-family:'Noto Sans KR','Segoe UI',sans-serif;background:#0f0f1a;min-hei
   </div>
 
   <div class="bank-banner">
-    <div class="bb-label">생일 모금 계좌</div>
+    <div class="bb-label" id="bank-label">생일 모금 계좌</div>
     <div class="bb-account">
-      <span id="bank-name">카카오뱅크</span>
-      <span id="bank-account">3333-01-0000000</span>
-      <button class="chip" onclick="copyAccount()">복사</button>
+      <span id="bank-name">토스뱅크</span>
+      <span id="bank-account">190883754416</span>
     </div>
     <div class="bb-holder" id="bank-holder">예금주 · 강동우</div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
+      <button class="bb-btn copy" onclick="copyAccount()">계좌 복사</button>
+      <button class="bb-btn toss" onclick="tossSend()">토스로 바로 보내기</button>
+    </div>
   </div>
 
   <div class="fund-banner">
@@ -210,8 +218,8 @@ const DEFAULT_SETTINGS={
   name:'강동우',
   subtitle:'휴대폰은 못 쓰지만 우리 모두의 마음은 여기 있어요\n메시지와 후원으로 축하해주세요',
   bankLabel:'생일 모금 계좌',
-  bankName:'카카오뱅크',
-  bankAccount:'3333-01-0000000',
+  bankName:'토스뱅크',
+  bankAccount:'190883754416',
   bankHolder:'강동우',
   amounts:[5000,10000,30000,50000],
 };
@@ -352,12 +360,30 @@ async function sendPost(){
 }
 
 function copyAccount(){
-  const v=settings.bankAccount||'';
+  const v=(settings.bankName||'')+' '+(settings.bankAccount||'');
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(v).then(()=>showToast('계좌번호가 복사됐어요')).catch(()=>showToast('계좌번호 : '+v));
+    navigator.clipboard.writeText(v).then(()=>showToast('계좌번호가 복사됐어요')).catch(()=>showToast('계좌 : '+v));
   }else{
-    showToast('계좌번호 : '+v);
+    showToast('계좌 : '+v);
   }
+}
+
+function tossSend(){
+  const amt=Math.max(0,Number(document.getElementById('post-amount').value)||0);
+  const acct=String(settings.bankAccount||'').replace(/[^0-9]/g,'');
+  const bank=encodeURIComponent(settings.bankName||'토스뱅크');
+  if(!acct){showToast('계좌번호가 설정되지 않았어요. 관리자 설정을 확인해주세요');return}
+  const url='supertoss://send?bank='+bank+'&accountNo='+acct+(amt>0?'&amount='+amt:'');
+  try{
+    const iframe=document.createElement('iframe');
+    iframe.style.display='none';
+    iframe.src=url;
+    document.body.appendChild(iframe);
+    setTimeout(()=>{try{iframe.remove()}catch(e){}},2000);
+  }catch(e){
+    location.href=url;
+  }
+  showToast(amt>0?'토스 앱이 열리면 '+fmt(amt)+'원 송금을 진행해주세요!':'토스 앱에서 송금을 진행해주세요! <br>앱이 없으면 계좌번호로 직접 보내주세요');
 }
 
 function delPost(id){
@@ -382,8 +408,8 @@ function openSettings(){
     '<label>타이틀</label><textarea id="st-title" rows="2" placeholder="동우야, 생일 축하해!"></textarea>'+
     '<label>이름</label><input id="st-name" placeholder="강동우">'+
     '<label>소개 문구</label><textarea id="st-subtitle" rows="2"></textarea>'+
-    '<label>은행 이름</label><input id="st-bankname" placeholder="카카오뱅크">'+
-    '<label>계좌번호</label><input id="st-account" placeholder="3333-01-0000000">'+
+    '<label>은행 이름</label><input id="st-bankname" placeholder="토스뱅크">'+
+    '<label>계좌번호</label><input id="st-account" placeholder="190883754416">'+
     '<label>예금주</label><input id="st-holder" placeholder="강동우">'+
     '<label>후원 금액 버튼 (쉼표 구분)</label><input id="st-amounts" placeholder="5000,10000,30000,50000">'+
     '<div class="pop-btns"><button class="pop-no" onclick="closePop()">닫기</button><button class="pop-ok" onclick="saveSettings()">저장</button></div>';
