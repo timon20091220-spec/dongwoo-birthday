@@ -185,6 +185,7 @@ body{font-family:'Noto Sans KR','Segoe UI',sans-serif;background:#0f0f1a;min-hei
         <input id="post-amount" type="number" min="0" step="1000" placeholder="직접 입력 또는 금액 선택" autocomplete="off">
         <span class="won">원</span>
       </div>
+      <div class="amount-limit" id="amount-limit" style="display:none;margin-top:8px;font-size:.78em;color:#888"></div>
     </div>
     <div class="field">
       <label>메시지</label>
@@ -230,6 +231,7 @@ const DEFAULT_SETTINGS={
   bankAccount:'190883754416',
   bankHolder:'강동우',
   amounts:[5000,10000,30000,50000],
+  maxPerPerson:50000,
 };
 
 const AVATAR_GRADIENTS=[
@@ -394,7 +396,19 @@ function esc(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-function fmt(n){return String(Number(n)||0).toLocaleString()}
+function fmt(n){
+  n=Number(n)||0;
+  let s;
+  if(Math.abs(n)>=Number.MAX_SAFE_INTEGER&&Number.isInteger(n)){
+    s=BigInt(n).toString();
+  }else{
+    s=String(Math.trunc(n));
+  }
+  const neg=s[0]==='-';
+  if(neg)s=s.slice(1);
+  s=s.replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1,');
+  return (neg?'-':'')+s;
+}
 
 function nl2br(s){return esc(s).replace(/\n/g,'<br>')}
 
@@ -406,6 +420,16 @@ function applySettings(){
   document.getElementById('bank-account').textContent=settings.bankAccount;
   document.getElementById('bank-holder').textContent='예금주 · '+settings.bankHolder;
   document.title=(settings.name||'동우')+'야, 생일 축하해';
+  const limit=document.getElementById('amount-limit');
+  const mp=Number(settings.maxPerPerson)||0;
+  if(limit){
+    if(mp>0){
+      limit.style.display='block';
+      limit.textContent='1인당 '+fmt(mp)+'원까지 후원할 수 있어요';
+    }else{
+      limit.style.display='none';
+    }
+  }
   renderAmountChips();
   renderTotal();
 }
@@ -493,6 +517,15 @@ async function sendPost(){
   if(!name){showToast('이름을 입력해주세요');return}
   if(!text){showToast('메시지를 입력해주세요');return}
   if(!fs){showToast('연결 오류입니다. 잠시 후 다시 시도해주세요');return}
+  const maxPerPerson=Number(settings.maxPerPerson)||0;
+  if(amount>0&&maxPerPerson>0){
+    const mine=postsCache.reduce((s,p)=>
+      s+(p&&p.name===name?(Number(p.amount)||0):0),0);
+    if(mine+amount>maxPerPerson){
+      showToast(name+'님은 1인당 최대 '+fmt(maxPerPerson)+'원까지만 후원할 수 있어요 (지금까지 '+fmt(mine)+'원)');
+      return;
+    }
+  }
   btn.disabled=true;
   try{
     await fs.collection('birthday_posts').add({name,amount,text,time:new Date()});
@@ -563,6 +596,7 @@ function openSettings(){
     '<label>계좌번호</label><input id="st-account" placeholder="190883754416">'+
     '<label>예금주</label><input id="st-holder" placeholder="강동우">'+
     '<label>후원 금액 버튼 (쉼표 구분)</label><input id="st-amounts" placeholder="5000,10000,30000,50000">'+
+    '<label>1인당 후원 한도</label><input id="st-maxtper" type="number" min="0" placeholder="50000">'+
     '<div class="pop-btns"><button class="pop-no" onclick="closePop()">닫기</button><button class="pop-ok" onclick="saveSettings()">저장</button></div>';
   document.getElementById('st-title').value=settings.title;
   document.getElementById('st-name').value=settings.name;
@@ -571,6 +605,7 @@ function openSettings(){
   document.getElementById('st-account').value=settings.bankAccount;
   document.getElementById('st-holder').value=settings.bankHolder;
   document.getElementById('st-amounts').value=(settings.amounts||[]).join(',');
+  document.getElementById('st-maxtper').value=settings.maxPerPerson||'';
   document.getElementById('admin-pop').classList.remove('hidden');
 }
 
@@ -584,6 +619,7 @@ async function saveSettings(){
     bankAccount:document.getElementById('st-account').value,
     bankHolder:document.getElementById('st-holder').value,
     amounts:amounts.length?amounts:DEFAULT_SETTINGS.amounts,
+    maxPerPerson:Math.max(0,Number(document.getElementById('st-maxtper').value)||0)||DEFAULT_SETTINGS.maxPerPerson,
   };
   try{
     await fs.collection('birthday_settings').doc('main').set(data);
