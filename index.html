@@ -92,6 +92,11 @@ body{font-family:'Noto Sans KR','Segoe UI',sans-serif;background:#0f0f1a;min-hei
 .loading{display:flex;justify-content:center;padding:40px}
 .spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,.1);border-top-color:#6c5ce7;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.firework{position:fixed;z-index:45;pointer-events:none;width:2px;height:2px;margin:-1px}
+.fw-part{position:absolute;left:0;top:0;border-radius:50%;animation:fwFly .95s cubic-bezier(.16,.84,.44,1) forwards}
+@keyframes fwFly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(.25);opacity:0}}
+.fw-ring{position:fixed;z-index:44;pointer-events:none;width:8px;height:8px;margin:-4px;border:2px solid rgba(255,255,255,.7);border-radius:50%;animation:fwRing .8s ease-out forwards}
+@keyframes fwRing{0%{transform:scale(.2);opacity:.9}100%{transform:scale(9);opacity:0}}
 .empty-text{text-align:center;color:#555;font-size:.88em;padding:28px 10px;line-height:1.8}
 .footer{text-align:center;margin-top:50px;padding-top:20px;border-top:1px solid rgba(255,255,255,.06);font-size:.8em;color:#444;line-height:1.8}
 .admin-link{background:none;border:none;cursor:pointer;color:#2a2a3e;font-size:.8em;text-decoration:underline;text-underline-offset:3px}
@@ -246,6 +251,45 @@ function showToast(msg){
   showToast._tm=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
+const FW_COLORS=['#6c5ce7','#a29bfe','#fd79a8','#fdcb6e','#00cec9','#ff7675','#fff','#ffe259','#7ed6df'];
+function launchFirework(x,y,parts){
+  const zone=document.createElement('div');
+  zone.className='firework';
+  zone.style.left=x+'px';
+  zone.style.top=y+'px';
+  const ring=document.createElement('div');
+  ring.className='fw-ring';
+  ring.style.left=x+'px';
+  ring.style.top=y+'px';
+  for(let i=0;i<parts;i++){
+    const p=document.createElement('div');
+    p.className='fw-part';
+    p.style.width=(5+Math.random()*6)+'px';
+    p.style.height=(5+Math.random()*6)+'px';
+    p.style.background=FW_COLORS[Math.floor(Math.random()*FW_COLORS.length)];
+    const ang=(i/parts)*Math.PI*2+(Math.random()*0.4-0.2);
+    const dist=45+Math.random()*75;
+    p.style.setProperty('--tx',(Math.cos(ang)*dist).toFixed(1)+'px');
+    p.style.setProperty('--ty',(Math.sin(ang)*dist).toFixed(1)+'px');
+    p.style.animationDelay=(Math.random()*0.12)+'s';
+    p.style.boxShadow='0 0 '+Math.floor(6+Math.random()*6)+'px currentColor';
+    zone.appendChild(p);
+  }
+  document.body.appendChild(zone);
+  document.body.appendChild(ring);
+  setTimeout(()=>{try{zone.remove();ring.remove()}catch(e){}},1300);
+}
+
+function burst(count){
+  const w=document.documentElement.clientWidth;
+  const h=document.documentElement.clientHeight;
+  for(let i=0;i<count;i++){
+    const x=w*(0.15+Math.random()*0.7);
+    const y=h*(0.15+Math.random()*0.4);
+    setTimeout(()=>launchFirework(x,y,22+Math.floor(Math.random()*10)),i*180);
+  }
+}
+
 function esc(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
@@ -352,6 +396,8 @@ async function sendPost(){
     document.querySelectorAll('.amount-chip').forEach(c=>c.classList.remove('on'));
     updateCount();
     showToast(amount>0?fmt(amount)+'원 후원 기록이 등록됐어요! 소중한 정성 감사합니다':'메시지가 전달되었습니다');
+    if(amount>0)burst(5);
+    else burst(1);
   }catch(e){
     showToast('전송 실패. 다시 시도해주세요');
     console.warn(e);
@@ -479,6 +525,14 @@ function exitAdmin(){
     postsCache=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderPosts(postsCache);
   },e=>{console.warn(e)});
+  setTimeout(()=>burst(3),900);
+  setInterval(()=>{
+    if(document.hidden)return;
+    if(Math.random()>0.55)return;
+    const w=document.documentElement.clientWidth;
+    const h=document.documentElement.clientHeight;
+    launchFirework(w*(0.1+Math.random()*0.8),h*(0.2+Math.random()*0.35),16+Math.floor(Math.random()*8));
+  },3200);
 })();
 </script>
 </body>
