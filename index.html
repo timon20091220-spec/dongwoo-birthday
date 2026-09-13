@@ -161,6 +161,8 @@ body{font-family:'Noto Sans KR','Segoe UI',sans-serif;background:#0f0f1a;min-hei
     <div class="note" id="fund-note">후원해주면 동우가 세배로 기뻐해요</div>
   </div>
 
+  <div id="tap-hint" style="text-align:center;margin:-8px 0 20px;font-size:.8em;color:#666;font-weight:500">🎆 화면을 누르면 폭죽이 터져요</div>
+
   <div class="form-card">
     <div class="form-header">
       <div class="form-header-icon">🎁</div>
@@ -626,6 +628,12 @@ function exitAdmin(){
     const p=FW_PALETTES[Math.floor(Math.random()*FW_PALETTES.length)];
     fwRocket(w*(0.08+Math.random()*0.84),h+20,w*(0.15+Math.random()*0.7),h*(0.18+Math.random()*0.35),p);
   },3400);
+  document.addEventListener('click',function(e){
+    const t=e.target.closest('button,input,textarea,a,select,.amount-chip,.bb-btn,.del-btn,.admin-link,#tap-hint');
+    if(t)return;
+    if(!fwCanvas)initFireworks();
+    fwBurst(e.clientX,e.clientY,FW_PALETTES[Math.floor(Math.random()*FW_PALETTES.length)]);
+  },true);
 })();
 </script>
 </body>
