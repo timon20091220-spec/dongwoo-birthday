@@ -260,7 +260,7 @@ let fwCanvas,fwCtx,fwW,fwH,fwParts=[],fwRockets=[],fwAmbientOn=true;
 function initFireworks(){
   if(fwCanvas)return;
   fwCanvas=document.createElement('canvas');
-  fwCanvas.style.cssText='position:fixed;inset:0;z-index:30;pointer-events:none;';
+  fwCanvas.style.cssText='position:fixed;inset:0;z-index:1;pointer-events:none;';
   document.body.appendChild(fwCanvas);
   fwCtx=fwCanvas.getContext('2d');
   fwResize();
@@ -277,8 +277,8 @@ function fwRgb(c,a){
 function fwFrame(){
   requestAnimationFrame(fwFrame);
   if(!fwCtx)return;
-  fwCtx.globalCompositeOperation='source-over';
-  fwCtx.fillStyle='rgba(15,15,26,0.16)';
+  fwCtx.globalCompositeOperation='destination-out';
+  fwCtx.fillStyle='rgba(0,0,0,0.12)';
   fwCtx.fillRect(0,0,fwW,fwH);
   // rockets
   for(let i=fwRockets.length-1;i>=0;i--){
