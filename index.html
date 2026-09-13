@@ -99,6 +99,10 @@ body{font-family:'Noto Sans KR','Segoe UI',sans-serif;background:#0f0f1a;min-hei
 .admin-bar{position:fixed;top:14px;right:14px;z-index:40;display:flex;gap:8px}
 .admin-bar button{display:none;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#e74c3c;border-radius:12px;padding:8px 14px;font-size:.8em;cursor:pointer;font-family:inherit}
 .admin-on .admin-bar button{display:block}
+.fw-counter{position:fixed;top:14px;left:14px;z-index:40;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:8px 14px;font-size:.8em;color:#ccc;font-weight:600;backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,.25);white-space:nowrap}
+.fw-counter b{color:#fdcb6e;font-variant-numeric:tabular-nums}
+#tap-hint{font-size:.78em}
+@media(max-width:500px){.fw-counter{top:auto;bottom:14px;left:14px;font-size:.72em;padding:6px 12px}}
 .popover{position:fixed;top:0;left:0;right:0;bottom:0;z-index:60;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;animation:fadeIn .2s;padding:16px}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .popover.hidden{display:none}
@@ -127,6 +131,8 @@ body{font-family:'Noto Sans KR','Segoe UI',sans-serif;background:#0f0f1a;min-hei
   <div class="orb"></div>
   <div class="orb"></div>
 </div>
+
+<div class="fw-counter">🎆 오늘의 폭죽 <b id="fw-count">0</b>회</div>
 
 <div class="admin-bar">
   <button id="btn-settings" onclick="openSettings()">설정</button>
@@ -255,12 +261,11 @@ const FW_PALETTES=[
   [[0,206,201],[126,214,223],[213,255,254],[255,255,255]],
   [[255,118,117],[255,224,204],[255,255,255],[255,240,150]],
 ];
-let fwCanvas,fwCtx,fwW,fwH,fwParts=[],fwRockets=[],fwAmbientOn=true,fwClickCount=0;
+let fwCanvas,fwCtx,fwW,fwH,fwParts=[],fwRockets=[],fwAmbientOn=true,fwTotal=0;
 
-function updateTapHint(){
-  const el=document.getElementById('tap-hint');
-  if(!el)return;
-  el.textContent='🎆 화면을 누르면 폭죽이 터져요'+(fwClickCount?' · 오늘 '+fwClickCount+'회':'');
+function updateFwCounter(){
+  const el=document.getElementById('fw-count');
+  if(el)el.textContent=Number(fwTotal)||0;
 }
 
 function initFireworks(){
@@ -627,7 +632,10 @@ function exitAdmin(){
   },e=>{console.warn(e)});
   setTimeout(()=>fwCelebrate(4),900);
   setTimeout(()=>initFireworks(),1200);
-  updateTapHint();
+  fs.collection('birthday_fireworks').doc('total').onSnapshot(d=>{
+    fwTotal=d.exists?(Number(d.data().count)||0):0;
+    updateFwCounter();
+  },e=>{console.warn(e);updateFwCounter()});
   setInterval(()=>{
     if(document.hidden)return;
     if(Math.random()>0.6)return;
@@ -640,8 +648,9 @@ function exitAdmin(){
     const t=e.target.closest('button,input,textarea,a,select,.amount-chip,.bb-btn,.del-btn,.admin-link,#tap-hint');
     if(t)return;
     if(!fwCanvas)initFireworks();
-    fwClickCount++;
-    updateTapHint();
+    fwTotal=(Number(fwTotal)||0)+1;
+    updateFwCounter();
+    if(fs)fs.collection('birthday_fireworks').doc('total').set({count:firebase.firestore.FieldValue.increment(1)},{merge:true}).catch(e=>console.warn('fw count',e));
     fwBurst(e.clientX,e.clientY,FW_PALETTES[Math.floor(Math.random()*FW_PALETTES.length)]);
   },true);
 })();
